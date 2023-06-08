@@ -3,6 +3,7 @@ using System.Text;
 using UserIntern.Interfaces;
 using UserIntern.Models.DTO;
 using UserIntern.Models;
+using System.Diagnostics;
 
 namespace UserIntern.Services
 {
@@ -32,24 +33,28 @@ namespace UserIntern.Services
         {
             UserDTO userDetails = null;
             var userData = await _userRepo.Get(user.UserId);
-            if(userData!=null && userData.Status.Equals("abled"))
+            if(userData!=null)
             {
-                var hmac = new HMACSHA512(userData.PasswordKey);
-                var password = hmac.ComputeHash(Encoding.UTF8.GetBytes(user.Password));
-                for (int i = 0; i < password.Length; i++)
+                if(userData.Role.Equals("admin".ToLower()) ||(userData.Role.Equals("intern".ToLower()) && userData.Status.Equals("abled".ToLower())))
                 {
-                    if (password[i] != userData.PasswordHash[i])
+                    var hmac = new HMACSHA512(userData.PasswordKey);
+                    var password = hmac.ComputeHash(Encoding.UTF8.GetBytes(user.Password));
+                    for (int i = 0; i < password.Length; i++)
                     {
-                        return null;
+                        if (password[i] != userData.PasswordHash[i])
+                        {
+                            return null;
+                        }
                     }
+                    userDetails = new UserDTO();
+                    userDetails.UserId = user.UserId;
+                    userDetails.Role = user.Role;
+                    userDetails.Token = _tokenService.GenerateToken(userDetails);
                 }
-                user = new UserDTO();
-                user.UserId = user.UserId;
-                user.Role = user.Role;
-                user.Token = _tokenService.GenerateToken(user);
+               
 
             }
-            return user;
+            return userDetails;
         }
 
         public async Task<UserDTO> Register(InternDTO intern)
@@ -58,9 +63,11 @@ namespace UserIntern.Services
             UserDTO user = null;
             var hmac = new HMACSHA512();
             string? generatedPassword = await _passwordService.GeneratePassword(intern);
-            intern.User.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(generatedPassword ?? intern.Name+"123"));
+            Debug.WriteLine(generatedPassword);
+            intern.User.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(generatedPassword ?? "123" ));
             intern.User.PasswordKey = hmac.Key;
             var userResult = await _userRepo.Add(intern.User);
+           
             var internResult = await _internRepo.Add(intern);
             if (userResult != null && internResult != null)
             {
@@ -72,6 +79,7 @@ namespace UserIntern.Services
             return user;
 
         }
+
     }
 
 }

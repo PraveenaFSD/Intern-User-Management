@@ -2,6 +2,9 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Data;
+using System.Threading.Tasks;
 using UserIntern.Interfaces;
 using UserIntern.Models;
 using UserIntern.Models.DTO;
@@ -16,10 +19,12 @@ namespace UserIntern.Controllers
         public class UserController : ControllerBase
         {
             private readonly IManageUser _manageUser;
+        private readonly IRepo<int, User> _repo;
 
-            public UserController(IManageUser manageUser)
+        public UserController(IManageUser manageUser, IRepo<int, User> userRepo)
             {
                 _manageUser = manageUser;
+                _repo=userRepo;
             }
             [HttpPost]
         [ProducesResponseType(typeof(UserDTO), 201)]
@@ -48,6 +53,23 @@ namespace UserIntern.Controllers
 
 
         }
+        [Authorize(Roles = "admin")]
+        [HttpGet("getalluser")]
+        [ProducesResponseType(typeof(ICollection<User>), 200)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<User>> GetAllUser()
+        {
+            ICollection<User> users = await _repo.GetAll();
+            if (users != null)
+            {
+                return Ok(users);
+            }
+            return NotFound(new Error(1, "No User Details Currently"));
+
+        }
+
+
     }
-    }
+}
 
