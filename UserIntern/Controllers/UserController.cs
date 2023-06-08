@@ -11,34 +11,36 @@ using UserIntern.Models.DTO;
 
 namespace UserIntern.Controllers
 {
-    
-    
-        [Route("api/[controller]")]
-        [ApiController]
-        [EnableCors("AngularCORS")]
-        public class UserController : ControllerBase
-        {
-            private readonly IManageUser _manageUser;
-        private readonly IRepo<int, User> _repo;
 
-        public UserController(IManageUser manageUser, IRepo<int, User> userRepo)
-            {
-                _manageUser = manageUser;
-                _repo=userRepo;
-            }
-            [HttpPost]
+
+    [Route("api/[controller]")]
+    [ApiController]
+    [EnableCors("AngularCORS")]
+    public class UserController : ControllerBase
+    {
+        private readonly IManageUser _manageUser;
+        private readonly IRepo<int, Intern> _internRepo;
+   
+
+        public UserController(IManageUser manageUser, IRepo<int, Intern> internRepo)
+        {
+            _manageUser = manageUser;
+            _internRepo = internRepo;
+           
+        }
+        [HttpPost("Register User")]
         [ProducesResponseType(typeof(UserDTO), 201)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<UserDTO>> Register(InternDTO intern)
+        {
+            var result = await _manageUser.Register(intern);
+            if (result != null)
             {
-                var result = await _manageUser.Register(intern);
-                if (result != null)
-                {
-                return Created("Home", intern);
+                return Created("Home", result);
             }
             return BadRequest(new Error(2, "Unable to register user at this moment"));
         }
-        
+
         [HttpPost("Login User")]
         [ProducesResponseType(typeof(UserDTO), 200)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -54,35 +56,41 @@ namespace UserIntern.Controllers
 
         }
         [Authorize(Roles = "admin")]
-        [HttpGet("getalluser")]
-        [ProducesResponseType(typeof(ICollection<User>), 200)]
+        [HttpGet("Get All Intern")]
+        [ProducesResponseType(typeof(ICollection<Intern>), 200)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<User>> GetAllUser()
+        public async Task<ActionResult<Intern>> GetAllInters()
         {
-            ICollection<User> users = await _repo.GetAll();
-            if (users != null)
+            ICollection<Intern> interns = await _internRepo.GetAll();
+            if (interns != null)
             {
-                return Ok(users);
+                return Ok(interns);
             }
-            return NotFound(new Error(1, "No User Details Currently"));
+            return NotFound(new Error(1, "No Intern Details Currently"));
 
         }
+      
         [Authorize(Roles = "admin")]
-        [HttpGet("get single user")]
-        [ProducesResponseType(typeof(ICollection<User>), 200)]
+        [HttpGet("Get Single Intern")]
+        [ProducesResponseType(typeof(ICollection<Intern>), 200)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<User>> GetSingleUser(int userId)
+        public async Task<ActionResult<Intern>> GetSingleintern(int id)
         {
-            User users = await _repo.Get(userId);
-            if (users != null)
+            Intern intern = await _internRepo.Get(id);
+            if (intern != null)
             {
-                return Ok(users);
+                return Ok(intern);
             }
-            return NotFound(new Error(1, "No User Detail with this id"));
+            return NotFound(new Error(1, "No intern Detail with this id"));
 
         }
+        
+
+
+
+    
 
 
     }

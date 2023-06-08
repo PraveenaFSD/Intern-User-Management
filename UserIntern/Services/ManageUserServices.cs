@@ -4,6 +4,7 @@ using UserIntern.Interfaces;
 using UserIntern.Models.DTO;
 using UserIntern.Models;
 using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 
 namespace UserIntern.Services
 {
@@ -83,6 +84,9 @@ namespace UserIntern.Services
             
 
         }
+      
+
+        
 
     }
 

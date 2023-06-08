@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
+using System.Text;
 using UserIntern.Interfaces;
 using UserIntern.Models;
+using UserIntern.Models.DTO;
 
 namespace UserIntern.Services
 {
@@ -68,6 +71,11 @@ namespace UserIntern.Services
                 return user;
             }
             return null;
+
+
+
+
+
         }
     }
 }

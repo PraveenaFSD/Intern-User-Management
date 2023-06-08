@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 using UserIntern.Interfaces;
 using UserIntern.Models;
 
@@ -7,9 +8,9 @@ namespace UserIntern.Services
     public class InternRepo : IRepo<int, Intern>
     {
         private readonly UserContext _context;
-        private readonly ILogger<UserRepo> _logger;
+        private readonly ILogger<InternRepo> _logger;
 
-        public InternRepo(UserContext context, ILogger<UserRepo> logger)
+        public InternRepo(UserContext context, ILogger<InternRepo> logger)
         {
             _context = context;
             _logger = logger;
@@ -36,14 +37,18 @@ namespace UserIntern.Services
             throw new NotImplementedException();
         }
 
-        public Task<Intern?> Get(int key)
+        public async Task<Intern?> Get(int key)
         {
-            throw new NotImplementedException();
+            var interns = await _context.Interns.FirstOrDefaultAsync(u => u.Id == key);
+            return interns;
         }
 
-        public Task<ICollection<Intern>?> GetAll()
+        public async Task<ICollection<Intern>?> GetAll()
         {
-            throw new NotImplementedException();
+            var interns = await _context.Interns.ToListAsync();
+            if (interns.Count > 0)
+                return interns;
+            return null;
         }
 
         public Task<Intern?> Update(Intern item)
