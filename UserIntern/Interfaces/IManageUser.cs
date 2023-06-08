@@ -6,7 +6,7 @@ namespace UserIntern.Interfaces
     {
         public Task<UserDTO> Login(UserDTO user);
         public Task<UserDTO> Register(InternDTO intern);
-        public Task<UserDTO> ChangeStatus(UserDTO user);
+        public Task<UserStatus> ChangeStatus(UserStatus user);
         public Task<UserDTO> ChangePassword(UserDTO user);
 
     }

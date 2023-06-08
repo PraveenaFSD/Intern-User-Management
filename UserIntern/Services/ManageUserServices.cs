@@ -25,9 +25,24 @@ namespace UserIntern.Services
             _passwordService = passwordService;
             _tokenService = tokenService;
         }
-        public Task<UserDTO> ChangeStatus(UserDTO user)
+        public async Task<UserStatus> ChangeStatus(UserStatus user)
         {
-            throw new NotImplementedException();
+            User userUpdate;
+            var userData =await _userRepo.Get(user.Id);
+            if(userData != null)
+            {
+                userUpdate = new User();
+                userData.Status=user.Status;
+                
+                if(await _userRepo.Update(userData) != null)
+                {
+                    UserStatus userResult = new UserStatus();
+                    userResult.Id = user.Id;
+                   
+                    return userResult;
+                }
+            }
+            return null;
         }
 
         public async Task<UserDTO> Login(UserDTO user)
@@ -67,6 +82,7 @@ namespace UserIntern.Services
             Debug.WriteLine(generatedPassword);
             intern.User.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(generatedPassword ?? "" ));
             intern.User.PasswordKey = hmac.Key;
+            intern.User.Status = "disabled";
             var userResult = await _userRepo.Add(intern.User);
             if (intern.User.Role != "admin".ToLower())
             {
