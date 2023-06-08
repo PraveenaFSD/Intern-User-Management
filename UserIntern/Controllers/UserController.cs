@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using UserIntern.Interfaces;
 using UserIntern.Models;
 using UserIntern.Models.DTO;
+using UserIntern.Services;
 
 namespace UserIntern.Controllers
 {
@@ -20,12 +21,13 @@ namespace UserIntern.Controllers
     {
         private readonly IManageUser _manageUser;
         private readonly IRepo<int, Intern> _internRepo;
-   
+        private readonly IRepo<int, User> _userRepo;
 
-        public UserController(IManageUser manageUser, IRepo<int, Intern> internRepo)
+        public UserController(IManageUser manageUser, IRepo<int, Intern> internRepo,IRepo<int,User> userRepo)
         {
             _manageUser = manageUser;
             _internRepo = internRepo;
+            _userRepo=userRepo;
            
         }
         [HttpPost("Register User")]
@@ -86,11 +88,27 @@ namespace UserIntern.Controllers
             return NotFound(new Error(1, "No intern Detail with this id"));
 
         }
-        
 
 
 
-    
+        [Authorize]
+        [HttpPut("Update User Details")]
+        [ProducesResponseType(typeof(ICollection<User>), 200)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<UserDTO>> UpdateUserDeatils([FromBody] UserDTO user)
+        {
+            User userData = await _userRepo.Get(user.UserId);
+            if (userData == null)
+                return NotFound(new Error(1, "No such user is present"));
+            UserDTO userDetails = await _manageUser.ChangePassword(user);
+            if (userDetails != null)
+            {
+                return Ok(userDetails);
+            }
+            return BadRequest(new Error(2, "Cannot Update User Details"));
+        }
+
 
 
     }

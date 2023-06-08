@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 using UserIntern.Interfaces;
@@ -60,16 +61,24 @@ namespace UserIntern.Services
 
         public async Task<User?> Update(User item)
         {
-            var user = await Get(item.UserId);
-            if (user != null)
+            try
             {
-                user.Role = item.Role;
-                user.PasswordHash = item.PasswordHash;
-                user.PasswordKey = item.PasswordKey;
-                user.Status = item.Status;
-                await _context.SaveChangesAsync();
-                return user;
+                var user = await Get(item.UserId);
+                if (user != null)
+                {
+                    user.Role = item.Role;
+                    user.PasswordHash = item.PasswordHash;
+                    user.PasswordKey = item.PasswordKey;
+                    user.Status = item.Status;
+                    await _context.SaveChangesAsync();
+                    return user;
+                }
             }
+            catch(Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+            
             return null;
 
 

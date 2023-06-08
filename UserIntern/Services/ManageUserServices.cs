@@ -65,7 +65,7 @@ namespace UserIntern.Services
             var hmac = new HMACSHA512();
             string? generatedPassword = await _passwordService.GeneratePassword(intern);
             Debug.WriteLine(generatedPassword);
-            intern.User.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(generatedPassword ?? "123" ));
+            intern.User.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(generatedPassword ?? "" ));
             intern.User.PasswordKey = hmac.Key;
             var userResult = await _userRepo.Add(intern.User);
             if (intern.User.Role != "admin".ToLower())
@@ -84,9 +84,33 @@ namespace UserIntern.Services
             
 
         }
-      
+        public async Task<UserDTO> ChangePassword(UserDTO user)
+        {
 
-        
+            User userData = await _userRepo.Get(user.UserId);
+            if (userData != null)
+            {
+                var hmac = new HMACSHA512();
+
+                userData.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(user.Password));
+                userData.PasswordKey = hmac.Key;
+                var updateduser =await _userRepo.Update(userData);
+                if (updateduser != null)
+                {
+                    UserDTO userResult = new UserDTO();
+                    userResult.UserId = userData.UserId;
+                    userResult.Role = userData.Role;
+                    return userResult;
+
+                }
+
+
+            }
+
+            return null;
+        }
+
+
 
     }
 
