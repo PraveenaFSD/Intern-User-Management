@@ -67,16 +67,20 @@ namespace UserIntern.Services
             intern.User.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(generatedPassword ?? "123" ));
             intern.User.PasswordKey = hmac.Key;
             var userResult = await _userRepo.Add(intern.User);
-           
-            var internResult = await _internRepo.Add(intern);
-            if (userResult != null && internResult != null)
+            if (intern.User.Role != "admin".ToLower())
+            {
+                var internResult = await _internRepo.Add(intern);
+            }
+            if (userResult != null )
             {
                 user = new UserDTO();
-                user.UserId = internResult.Id;
+                user.UserId = userResult.UserId;
                 user.Role = userResult.Role;
                 user.Token = _tokenService.GenerateToken(user);
+                return user;
             }
-            return user;
+            return null;
+            
 
         }
 

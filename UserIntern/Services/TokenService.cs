@@ -24,8 +24,7 @@ namespace UserIntern.Services
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.NameId,user.UserId.ToString()),
-                //new Claim(ClaimTypes.Role,user.Role),
-                //new Claim(ClaimTypes.Role,user.UserType),
+                new Claim(ClaimTypes.Role,user.Role)
             };
             //Signature algorithm
             var cred = new SigningCredentials(_key, SecurityAlgorithms.HmacSha256);

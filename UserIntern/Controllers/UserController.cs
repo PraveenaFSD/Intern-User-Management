@@ -68,6 +68,21 @@ namespace UserIntern.Controllers
             return NotFound(new Error(1, "No User Details Currently"));
 
         }
+        [Authorize(Roles = "admin")]
+        [HttpGet("get single user")]
+        [ProducesResponseType(typeof(ICollection<User>), 200)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<User>> GetSingleUser(int userId)
+        {
+            User users = await _repo.Get(userId);
+            if (users != null)
+            {
+                return Ok(users);
+            }
+            return NotFound(new Error(1, "No User Detail with this id"));
+
+        }
 
 
     }
