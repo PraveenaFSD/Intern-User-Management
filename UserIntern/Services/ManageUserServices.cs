@@ -126,8 +126,39 @@ namespace UserIntern.Services
             return null;
         }
 
+        public async Task<List<AllUserDTO>> GetAllUserDetails()
+        {
+            ICollection<User> users = await _userRepo.GetAll();
+            List<AllUserDTO>? usersDetails = new  List<AllUserDTO>();
+            foreach (var u in users)
+            {
+                AllUserDTO userDTO = new AllUserDTO();
+                userDTO.Id = u.UserId;
+                userDTO.Role = u.Role;
+                userDTO.Status = u.Status;
+                usersDetails.Add(userDTO);
+            }
+
+            return usersDetails;
+        }
+
+        public async Task<AllUserDTO> GetSingleUserDetails(int id)
+        {
+           User userDetail = await _userRepo.Get(id);
+            if (userDetail != null)
+            {
+                AllUserDTO allUserDTO = new AllUserDTO();
+                allUserDTO.Id = userDetail.UserId;
+                allUserDTO.Role = userDetail.Role;
+                allUserDTO.Status = userDetail.Status;
+                return allUserDTO;
+            }
+            return null;
+           
 
 
+        }
     }
-
 }
+
+

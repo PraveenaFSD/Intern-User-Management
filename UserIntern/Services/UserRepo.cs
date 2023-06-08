@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 using UserIntern.Interfaces;
@@ -76,7 +75,7 @@ namespace UserIntern.Services
             }
             catch(Exception ex)
             {
-                Debug.WriteLine(ex.Message);
+                _logger.LogError(ex.Message);
             }
             
             return null;

@@ -62,7 +62,7 @@ namespace UserIntern.Controllers
         [ProducesResponseType(typeof(ICollection<Intern>), 200)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<Intern>> GetAllInters()
+        public async Task<ActionResult<Intern>> GetAllInterns()
         {
             ICollection<Intern> interns = await _internRepo.GetAll();
             if (interns != null)
@@ -79,7 +79,7 @@ namespace UserIntern.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
 
-        public async Task<ActionResult<Intern>> GetSingleintern(int id)
+        public async Task<ActionResult<Intern>> GetSingleIntern(int id)
         {
             Intern intern = await _internRepo.Get(id);
             if (intern != null)
@@ -89,11 +89,42 @@ namespace UserIntern.Controllers
             return NotFound(new Error(1, "No intern Detail with this id"));
 
         }
+        [Authorize(Roles = "admin")]
+        [HttpGet("Get All Users")]
+        [ProducesResponseType(typeof(IList<AllUserDTO>), 200)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<AllUserDTO>> GetAllUsers()
+        {
+            IList<AllUserDTO> users = await _manageUser.GetAllUserDetails();
+            if (users != null)
+            {
+                return Ok(users);
+            }
+            return NotFound(new Error(1, "No user Details Currently"));
+
+        }
+        [Authorize(Roles = "admin")]
+        [HttpGet("Get Single User")]
+        [ProducesResponseType(typeof(AllUserDTO), 200)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+
+        public async Task<ActionResult<AllUserDTO>> GetSingleUser(int id)
+        {
+            AllUserDTO user = await _manageUser.GetSingleUserDetails(id);
+            if (user != null)
+            {
+                return Ok(user);
+            }
+            return NotFound(new Error(1, "No user Detail with this id"));
+
+        }
 
 
 
         [Authorize]
-        [HttpPut("Update User Details")]
+        [HttpPut("Update User Password")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

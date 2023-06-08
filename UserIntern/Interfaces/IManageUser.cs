@@ -8,6 +8,8 @@ namespace UserIntern.Interfaces
         public Task<UserDTO> Register(InternDTO intern);
         public Task<UserStatus> ChangeStatus(UserStatus user);
         public Task<UserDTO> ChangePassword(UserDTO user);
+        public Task<List<AllUserDTO>?> GetAllUserDetails();
+        public Task<AllUserDTO> GetSingleUserDetails(int id);
 
     }
 }
